@@ -12,19 +12,25 @@ struct Content {
     
     // 파일에서 읽어와서 저장
     var name: String {
-        return ""
+        // do-catch문과 동일
+        let values = try? url.resourceValues(forKeys: [.localizedNameKey])
+        return values?.localizedName ?? "???"
     }
 
     var size: Int {
-        return 0
+        let values = try? url.resourceValues(forKeys: [.fileSizeKey])
+        return values?.fileSize ?? 0
     }
     
     var type: Type {
-        return .file
+        let values = try? url.resourceValues(forKeys: [.isDirectoryKey])
+        return values?.isDirectory == true ? .directory : .file
     }
     // 아이클라우드에서 제외되었는지 확인
     var isExcludedFromBackup: Bool {
-        return false
+        let values = try? url.resourceValues(forKeys: [.isExcludedFromBackupKey])
+        return values?.isExcludedFromBackup ?? false
+        
     }
     
     // 아이콘이미지
