@@ -40,6 +40,9 @@
                                         </label>
                                     </subviews>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <segue destination="Edk-NU-OXJ" kind="show" identifier="directorySegue" id="wSd-un-L5A"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>

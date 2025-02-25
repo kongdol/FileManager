@@ -16,6 +16,41 @@ class DirectoryTableViewController: UITableViewController {
     
     var contents = [Content]()
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let cell = sender as? UITableViewCell, let indexPath = tableView.indexPath(for: cell) {
+            if let vc = segue.destination as? DirectoryTableViewController {
+                vc.currentDirectoryUrl = contents[indexPath.row].url
+            }
+            
+        }
+    }
+    
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        if identifier == "directorySegue" {
+            if let cell = sender as? UITableViewCell, let indexPath = tableView.indexPath(for: cell) {
+                
+                do {
+                    let url = contents[indexPath.row].url
+                    // 정상접근할수 있으면 ture 리턴
+                    let reachable = try url.checkResourceIsReachable()
+                    if !reachable {
+                        return false
+                    }
+                } catch {
+                    print(error)
+                    return false
+                }
+                
+                
+                
+                // return이 true이면 실행이니까
+                return contents[indexPath.row].type == .directory
+            }
+        }
+        
+    
+        return true
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,6 +97,7 @@ class DirectoryTableViewController: UITableViewController {
         do {
             let properties: [URLResourceKey] = [.localizedNameKey, .isDirectoryKey, .fileSizeKey, .isExcludedFromBackupKey]
             
+            // 특정 폴더의 파일 목록 가져오기
             let currentContentUrls = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: properties, options: FileManager.DirectoryEnumerationOptions.skipsHiddenFiles) // 숨겨진 파일들 결과에서 제외
             
             for url in currentContentUrls {
@@ -82,13 +118,23 @@ class DirectoryTableViewController: UITableViewController {
         } catch {
             print(error)
         }
+        
+        if contents.isEmpty {
+            let label = UILabel(frame: .zero)
+            label.text = "빈 디렉토리"
+            label.textAlignment = .center
+            label.textColor = .secondaryLabel
+            tableView.backgroundView = label
+        } else {
+            tableView.backgroundView = nil
+        }
+        
     }
     
     
+    
+    
     // MARK: - Table view data source
-    
-    
-    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         return contents.count
