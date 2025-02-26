@@ -104,6 +104,31 @@ class DirectoryTableViewController: UITableViewController {
         refreshContents()
     }
     
+    func addImagefile() {
+        let name = Int.random(in: 1 ... 30)
+        guard let imageUrl = URL(string: "https://kxcodingblob.blob.core.windows.net/mastering-ios/\(name).jpg") else {
+            return
+        }
+        
+        guard let targetUrl = currentDirectoryUrl?.appendingPathComponent("\(name)").appendingPathExtension("jpg") else {
+            return
+        }
+        
+        // 다운로드 백그라운드 스레드
+        DispatchQueue.global().async {
+            do {
+                let data = try Data(contentsOf: imageUrl)
+                try data.write(to: targetUrl, options: .atomic)
+            } catch {
+                print(error)
+            }
+            
+            DispatchQueue.main.async {
+                self.refreshContents()
+            }
+        }
+    }
+    
     func setupMenu() {
         menuButton.menu = UIMenu(children: [
             UIAction(title: "새 디렉토리", image: UIImage(systemName: "folder"), handler: { _ in
@@ -113,7 +138,7 @@ class DirectoryTableViewController: UITableViewController {
                 self.addTextFile()
             }),
             UIAction(title: "새 이미지 파일", image: UIImage(systemName: "photo"), handler: { _ in
-                
+                self.addImagefile()
             })
             
         ])
