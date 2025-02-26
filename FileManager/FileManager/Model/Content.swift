@@ -7,6 +7,13 @@
 
 import UIKit
 
+fileprivate var formatter: ByteCountFormatter = {
+    let f = ByteCountFormatter()
+    f.isAdaptive = true // 값의크기에 따라서 적절한 단위로 바꿔줌
+    f.includesUnit = true // 단위추가
+    return f
+}()
+
 struct Content {
     let url: URL
     
@@ -15,6 +22,10 @@ struct Content {
         // do-catch문과 동일
         let values = try? url.resourceValues(forKeys: [.localizedNameKey])
         return values?.localizedName ?? "???"
+    }
+    
+    var sizeString: String? {
+        return formatter.string(for: size)
     }
 
     var size: Int {

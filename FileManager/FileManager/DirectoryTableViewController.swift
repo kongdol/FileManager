@@ -89,13 +89,28 @@ class DirectoryTableViewController: UITableViewController {
         refreshContents()
     }
     
+    func addTextFile() {
+        let content = Date.now.description
+        
+        guard let targetUrl = currentDirectoryUrl?.appendingPathComponent("current-time").appendingPathExtension("txt") else {
+            return
+        }
+        do {
+            try content.write(to: targetUrl, atomically: true, encoding: .utf8)
+        } catch {
+            print(error)
+        }
+        
+        refreshContents()
+    }
+    
     func setupMenu() {
         menuButton.menu = UIMenu(children: [
             UIAction(title: "새 디렉토리", image: UIImage(systemName: "folder"), handler: { _ in
                 self.showNameInputAlert()
             }),
             UIAction(title: "새 텍스트 파일", image: UIImage(systemName: "doc.text"), handler: { _ in
-                
+                self.addTextFile()
             }),
             UIAction(title: "새 이미지 파일", image: UIImage(systemName: "photo"), handler: { _ in
                 
@@ -170,7 +185,7 @@ class DirectoryTableViewController: UITableViewController {
             cell.accessoryType = .disclosureIndicator
         case .file:
             cell.textLabel?.text = target.name
-            cell.detailTextLabel?.text = "\(target.size)"
+            cell.detailTextLabel?.text = target.sizeString
             cell.accessoryType = .none
         
         }
